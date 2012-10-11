@@ -21,14 +21,20 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/*
+	A helper package for converting between datatypes.
+
+	If a certain datatype could not be directly converted to another, the
+	zero value of the destination type would be returned instead.
+*/
 package to
 
 import (
-	"strconv"
 	"fmt"
+	"strconv"
 )
 
-// String conversion
+/* Converts the given value into a string. */
 func String(value interface{}) string {
 	result := ""
 
@@ -39,6 +45,7 @@ func String(value interface{}) string {
 	return result
 }
 
+/* Converts the given value, if possible, into a []interface{}. Returns an empty []interface{} otherwise. */
 func List(value interface{}) []interface{} {
 	list := []interface{}{}
 
@@ -54,22 +61,43 @@ func List(value interface{}) []interface{} {
 	return list
 }
 
-func Int(value interface{}) int64 {
+/* Converts the given value, if possible, into an int. Returns 0 otherwise. */
+func Int(value interface{}) int {
+	result := int(0)
+	if value != nil {
+		result, _ = strconv.Atoi(String(value))
+	}
+	return result
+}
+
+/* Converts the given value, if possible, into an int64. Returns 0 otherwise. */
+func Int64(value interface{}) int64 {
 	result := int64(0)
 	if value != nil {
-		result, _ = strconv.ParseInt(fmt.Sprintf("%v", value), 10, 64)
+		result, _ = strconv.ParseInt(String(value), 10, 64)
 	}
 	return result
 }
 
-func Float(value interface{}) float64 {
+/* Converts the given value, if possible, into an uint64. Returns 0 otherwise. */
+func Uint64(value interface{}) uint64 {
+	result := uint64(0)
+	if value != nil {
+		result, _ = strconv.ParseUint(String(value), 10, 64)
+	}
+	return result
+}
+
+/* Converts the given value, if possible, into a float64. Returns 0.0 otherwise. */
+func Float64(value interface{}) float64 {
 	result := float64(0)
 	if value != nil {
-		result, _ = strconv.ParseFloat(fmt.Sprintf("%v", value), 64)
+		result, _ = strconv.ParseFloat(String(value), 64)
 	}
 	return result
 }
 
+/* Converts the given value, if possible, into a bool. Returns false otherwise. */
 func Bool(value interface{}) bool {
 	result := true
 
