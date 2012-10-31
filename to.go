@@ -31,6 +31,7 @@ package to
 
 import (
 	"fmt"
+	"github.com/gosexy/sugar"
 	"strconv"
 )
 
@@ -59,6 +60,25 @@ func List(value interface{}) []interface{} {
 	}
 
 	return list
+}
+
+/* Converts the given value, if possible, into a map[string]interface{}. Returns nil otherwise. */
+func Map(value interface{}) map[string]interface{} {
+
+	if value != nil {
+		switch value.(type) {
+		case map[string]interface{}:
+			return value.(map[string]interface{})
+		case sugar.Tuple:
+			mapped := map[string]interface{}{}
+			for k, v := range value.(sugar.Tuple) {
+				mapped[k] = v
+			}
+			return mapped
+		}
+	}
+
+	return nil
 }
 
 /* Converts the given value, if possible, into an int. Returns 0 otherwise. */
