@@ -81,6 +81,25 @@ func Map(value interface{}) map[string]interface{} {
 	return nil
 }
 
+/* Converts the given value, if possible, into a sugar.Tuple. Returns nil otherwise. */
+func Tuple(value interface{}) sugar.Tuple {
+
+	if value != nil {
+		switch value.(type) {
+		case map[string]interface{}:
+			mapped := sugar.Tuple{}
+			for k, v := range value.(map[string]interface{}) {
+				mapped[k] = v
+			}
+			return mapped
+		case sugar.Tuple:
+			return value.(sugar.Tuple)
+		}
+	}
+
+	return nil
+}
+
 /* Converts the given value, if possible, into an int. Returns 0 otherwise. */
 func Int(value interface{}) int {
 	result := int(0)
