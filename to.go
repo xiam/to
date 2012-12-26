@@ -63,15 +63,16 @@ func List(value interface{}) []interface{} {
 }
 
 /* Converts the given value, if possible, into a map[string]interface{}. Returns nil otherwise. */
+/*
 func Map(value interface{}) map[string]interface{} {
 
 	if value != nil {
 		switch value.(type) {
 		case map[string]interface{}:
 			return value.(map[string]interface{})
-		case sugar.Tuple:
+		case sugar.Map:
 			mapped := map[string]interface{}{}
-			for k, v := range value.(sugar.Tuple) {
+			for k, v := range value.(sugar.Map) {
 				mapped[k] = v
 			}
 			return mapped
@@ -80,20 +81,21 @@ func Map(value interface{}) map[string]interface{} {
 
 	return nil
 }
+*/
 
-/* Converts the given value, if possible, into a sugar.Tuple. Returns nil otherwise. */
-func Tuple(value interface{}) sugar.Tuple {
+/* Converts the given value, if possible, into a sugar.Map. Returns nil otherwise. */
+func Map(value interface{}) sugar.Map {
 
 	if value != nil {
 		switch value.(type) {
 		case map[string]interface{}:
-			mapped := sugar.Tuple{}
+			mapped := sugar.Map{}
 			for k, v := range value.(map[string]interface{}) {
 				mapped[k] = v
 			}
 			return mapped
-		case sugar.Tuple:
-			return value.(sugar.Tuple)
+		case sugar.Map:
+			return value.(sugar.Map)
 		}
 	}
 
