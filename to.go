@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 José Carlos Nieto, http://xiam.menteslibres.org/
+  Copyright (c) 2012-2013 José Carlos Nieto, http://xiam.menteslibres.org/
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
@@ -32,18 +32,86 @@ package to
 import (
 	"fmt"
 	"github.com/gosexy/sugar"
+	"reflect"
 	"strconv"
 )
 
-/* Converts the given value into a string. */
-func String(value interface{}) string {
-	result := ""
+const (
+	digits     = "0123456789"
+	uintbuflen = 20
+)
 
-	if value != nil {
-		result = fmt.Sprintf("%v", value)
+func uint64ToByte(v uint64) []byte {
+	buf := make([]byte, uintbuflen)
+
+	i := len(buf)
+
+	for v >= 10 {
+		i--
+		buf[i] = digits[v%10]
+		v = v / 10
 	}
 
-	return result
+	i--
+	buf[i] = digits[v%10]
+
+	return buf[i:]
+}
+
+func int64ToByte(v int64) []byte {
+	negative := false
+
+	if v < 0 {
+		negative = true
+		v = -v
+	}
+
+	uv := uint64(v)
+
+	buf := uint64ToByte(uv)
+
+	if negative {
+		buf2 := []byte{'-'}
+		buf2 = append(buf2, buf...)
+		return buf2
+	}
+
+	return buf
+}
+
+/* Converts the given value into a string. */
+func String(val interface{}) string {
+	var buf []byte
+
+	switch val.(type) {
+
+	case int:
+		buf = int64ToByte(int64(val.(int)))
+	case int8:
+		buf = int64ToByte(int64(val.(int8)))
+	case int16:
+		buf = int64ToByte(int64(val.(int16)))
+	case int32:
+		buf = int64ToByte(int64(val.(int32)))
+	case int64:
+		buf = int64ToByte(val.(int64))
+
+	case uint:
+		buf = uint64ToByte(uint64(val.(uint)))
+	case uint8:
+		buf = uint64ToByte(uint64(val.(uint8)))
+	case uint16:
+		buf = uint64ToByte(uint64(val.(uint16)))
+	case uint32:
+		buf = uint64ToByte(uint64(val.(uint32)))
+	case uint64:
+		buf = uint64ToByte(val.(uint64))
+
+	default:
+		fmt.Printf("Failed %v -> string\n", reflect.ValueOf(val).Kind())
+	}
+
+	return string(buf)
 }
 
 /* Converts the given value, if possible, into a []interface{}. Returns an empty []interface{} otherwise. */
