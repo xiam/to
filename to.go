@@ -26,12 +26,14 @@
 
 	If a certain datatype could not be directly converted to another, the
 	zero value of the destination type would be returned instead.
+
+	This is a experimental package, it may change anytime without warning.
 */
 package to
 
 import (
+	//"github.com/gosexy/sugar"
 	"fmt"
-	"github.com/gosexy/sugar"
 	"reflect"
 	"strconv"
 )
@@ -41,7 +43,7 @@ const (
 	uintbuflen = 20
 )
 
-func uint64ToByte(v uint64) []byte {
+func uint64ToBytes(v uint64) []byte {
 	buf := make([]byte, uintbuflen)
 
 	i := len(buf)
@@ -58,7 +60,7 @@ func uint64ToByte(v uint64) []byte {
 	return buf[i:]
 }
 
-func int64ToByte(v int64) []byte {
+func int64ToBytes(v int64) []byte {
 	negative := false
 
 	if v < 0 {
@@ -68,7 +70,7 @@ func int64ToByte(v int64) []byte {
 
 	uv := uint64(v)
 
-	buf := uint64ToByte(uv)
+	buf := uint64ToBytes(uv)
 
 	if negative {
 		buf2 := []byte{'-'}
@@ -79,146 +81,305 @@ func int64ToByte(v int64) []byte {
 	return buf
 }
 
-/* Converts the given value into a string. */
+func float32ToBytes(v float32) []byte {
+	slice := strconv.AppendFloat(nil, float64(v), 'g', -1, 32)
+	return slice
+}
+
+func float64ToBytes(v float64) []byte {
+	slice := strconv.AppendFloat(nil, v, 'g', -1, 64)
+	return slice
+}
+
+func complex128ToBytes(v complex128) []byte {
+	buf := []byte{'('}
+
+	r := strconv.AppendFloat(buf, real(v), 'g', -1, 64)
+
+	im := imag(v)
+	if im >= 0 {
+		buf = append(r, '+')
+	} else {
+		buf = r
+	}
+
+	i := strconv.AppendFloat(buf, im, 'g', -1, 64)
+
+	buf = append(i, []byte{'i', ')'}...)
+
+	return buf
+}
+
 func String(val interface{}) string {
 	var buf []byte
+
+	if val == nil {
+		return ""
+	}
 
 	switch val.(type) {
 
 	case int:
-		buf = int64ToByte(int64(val.(int)))
+		buf = int64ToBytes(int64(val.(int)))
 	case int8:
-		buf = int64ToByte(int64(val.(int8)))
+		buf = int64ToBytes(int64(val.(int8)))
 	case int16:
-		buf = int64ToByte(int64(val.(int16)))
+		buf = int64ToBytes(int64(val.(int16)))
 	case int32:
-		buf = int64ToByte(int64(val.(int32)))
+		buf = int64ToBytes(int64(val.(int32)))
 	case int64:
-		buf = int64ToByte(val.(int64))
+		buf = int64ToBytes(val.(int64))
 
 	case uint:
-		buf = uint64ToByte(uint64(val.(uint)))
+		buf = uint64ToBytes(uint64(val.(uint)))
 	case uint8:
-		buf = uint64ToByte(uint64(val.(uint8)))
+		buf = uint64ToBytes(uint64(val.(uint8)))
 	case uint16:
-		buf = uint64ToByte(uint64(val.(uint16)))
+		buf = uint64ToBytes(uint64(val.(uint16)))
 	case uint32:
-		buf = uint64ToByte(uint64(val.(uint32)))
+		buf = uint64ToBytes(uint64(val.(uint32)))
 	case uint64:
-		buf = uint64ToByte(val.(uint64))
+		buf = uint64ToBytes(val.(uint64))
+
+	case float32:
+		buf = float32ToBytes(val.(float32))
+	case float64:
+		buf = float64ToBytes(val.(float64))
+
+	case complex128:
+		buf = complex128ToBytes(val.(complex128))
+	case complex64:
+		buf = complex128ToBytes(complex128(val.(complex64)))
+
+	case bool:
+		if val.(bool) == true {
+			return "true"
+		} else {
+			return "false"
+		}
+
+	case string:
+		return val.(string)
+
+	case []byte:
+		return string(val.([]byte))
 
 	default:
-		fmt.Printf("Failed %v -> string\n", reflect.ValueOf(val).Kind())
+		return fmt.Sprintf("%v", val)
 	}
 
 	return string(buf)
 }
 
-/* Converts the given value, if possible, into a []interface{}. Returns an empty []interface{} otherwise. */
-func List(value interface{}) []interface{} {
+func List(val interface{}) []interface{} {
 	list := []interface{}{}
 
-	if value != nil {
-		switch value.(type) {
-		case []interface{}:
-			for _, v := range value.([]interface{}) {
-				list = append(list, v)
-			}
+	if val == nil {
+		return list
+	}
+
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Slice:
+		vval := reflect.ValueOf(val)
+
+		size := vval.Len()
+		list := make([]interface{}, size)
+		vlist := reflect.ValueOf(list)
+
+		for i := 0; i < size; i++ {
+			vlist.Index(i).Set(vval.Index(i))
 		}
+
+		return list
 	}
 
 	return list
 }
 
-/* Converts the given value, if possible, into a map[string]interface{}. Returns nil otherwise. */
-/*
-func Map(value interface{}) map[string]interface{} {
+func Map(val interface{}) map[string]interface{} {
 
-	if value != nil {
-		switch value.(type) {
-		case map[string]interface{}:
-			return value.(map[string]interface{})
-		case sugar.Map:
-			mapped := map[string]interface{}{}
-			for k, v := range value.(sugar.Map) {
-				mapped[k] = v
-			}
-			return mapped
+	list := map[string]interface{}{}
+
+	if val == nil {
+		return list
+	}
+
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Map:
+		vval := reflect.ValueOf(val)
+		vlist := reflect.ValueOf(list)
+
+		for _, vkey := range vval.MapKeys() {
+			key := String(vkey.Interface())
+			vlist.SetMapIndex(reflect.ValueOf(key), vval.MapIndex(vkey))
 		}
+
+		return list
 	}
 
-	return nil
+	return list
 }
-*/
 
-/* Converts the given value, if possible, into a sugar.Map. Returns nil otherwise. */
-func Map(value interface{}) sugar.Map {
+func Int(val interface{}) int {
+	return int(Int64(val))
+}
 
-	if value != nil {
-		switch value.(type) {
-		case map[string]interface{}:
-			mapped := sugar.Map{}
-			for k, v := range value.(map[string]interface{}) {
-				mapped[k] = v
-			}
-			return mapped
-		case sugar.Map:
-			return value.(sugar.Map)
+func Int8(val interface{}) int8 {
+	return int8(Int64(val))
+}
+
+func Int16(val interface{}) int16 {
+	return int16(Int64(val))
+}
+
+func Int32(val interface{}) int32 {
+	return int32(Int64(val))
+}
+
+func Int64(val interface{}) int64 {
+	var i int64
+
+	switch val.(type) {
+	case int:
+		i = int64(val.(int))
+	case int8:
+		i = int64(val.(int8))
+	case int16:
+		i = int64(val.(int16))
+	case int32:
+		i = int64(val.(int32))
+	case int64:
+		i = val.(int64)
+	case uint:
+		i = int64(val.(uint))
+	case uint8:
+		i = int64(val.(uint8))
+	case uint16:
+		i = int64(val.(uint16))
+	case uint32:
+		i = int64(val.(uint32))
+	case uint64:
+		i = int64(val.(uint64))
+	case bool:
+		if val.(bool) == true {
+			i = int64(1)
+		} else {
+			i = int64(0)
 		}
+	case string:
+		i, _ = strconv.ParseInt(val.(string), 10, 64)
+	case float32:
+		i = int64(val.(float32))
+	case float64:
+		i = int64(val.(float64))
 	}
 
-	return nil
+	return i
 }
 
-/* Converts the given value, if possible, into an int. Returns 0 otherwise. */
-func Int(value interface{}) int {
-	result := int(0)
-	if value != nil {
-		result, _ = strconv.Atoi(String(value))
+func Uint(val interface{}) uint {
+	return uint(Uint64(val))
+}
+
+func Uint8(val interface{}) uint8 {
+	return uint8(Uint64(val))
+}
+
+func Uint16(val interface{}) uint16 {
+	return uint16(Uint64(val))
+}
+
+func Uint32(val interface{}) uint32 {
+	return uint32(Uint64(val))
+}
+
+func Uint64(val interface{}) uint64 {
+	var i uint64
+
+	switch val.(type) {
+	case int:
+		i = uint64(val.(int))
+	case int8:
+		i = uint64(val.(int8))
+	case int16:
+		i = uint64(val.(int16))
+	case int32:
+		i = uint64(val.(int32))
+	case int64:
+		i = uint64(val.(int64))
+	case uint:
+		i = uint64(val.(uint))
+	case uint8:
+		i = uint64(val.(uint8))
+	case uint16:
+		i = uint64(val.(uint16))
+	case uint32:
+		i = uint64(val.(uint32))
+	case uint64:
+		i = val.(uint64)
+	case bool:
+		if val.(bool) == true {
+			i = uint64(1)
+		} else {
+			i = uint64(0)
+		}
+	case string:
+		i, _ = strconv.ParseUint(val.(string), 10, 64)
+	case float32:
+		i = uint64(val.(float32))
+	case float64:
+		i = uint64(val.(float64))
 	}
-	return result
+
+	return i
 }
 
-/* Converts the given value, if possible, into an int64. Returns 0 otherwise. */
-func Int64(value interface{}) int64 {
-	result := int64(0)
-	if value != nil {
-		result, _ = strconv.ParseInt(String(value), 10, 64)
+func Float32(val interface{}) float32 {
+	return float32(Float64(val))
+}
+
+func Float64(val interface{}) float64 {
+	var f float64
+
+	switch val.(type) {
+	case int:
+		f = float64(val.(int))
+	case int8:
+		f = float64(val.(int8))
+	case int16:
+		f = float64(val.(int16))
+	case int32:
+		f = float64(val.(int32))
+	case int64:
+		f = float64(val.(int64))
+	case uint:
+		f = float64(val.(uint))
+	case uint8:
+		f = float64(val.(uint8))
+	case uint16:
+		f = float64(val.(uint16))
+	case uint32:
+		f = float64(val.(uint32))
+	case uint64:
+		f = float64(val.(uint64))
+	case bool:
+		if val.(bool) == true {
+			f = float64(1)
+		} else {
+			f = float64(0)
+		}
+	case string:
+		f, _ = strconv.ParseFloat(val.(string), 64)
+	case float32:
+		f = float64(val.(float32))
+	case float64:
+		f = val.(float64)
 	}
-	return result
+
+	return f
 }
 
-/* Converts the given value, if possible, into an uint64. Returns 0 otherwise. */
-func Uint64(value interface{}) uint64 {
-	result := uint64(0)
-	if value != nil {
-		result, _ = strconv.ParseUint(String(value), 10, 64)
-	}
-	return result
-}
-
-/* Converts the given value, if possible, into a float64. Returns 0.0 otherwise. */
-func Float64(value interface{}) float64 {
-	result := float64(0)
-	if value != nil {
-		result, _ = strconv.ParseFloat(String(value), 64)
-	}
-	return result
-}
-
-/* Converts the given value, if possible, into a bool. Returns false otherwise. */
 func Bool(value interface{}) bool {
-	result := true
-
-	if value == nil {
-		result = false
-	} else {
-		switch String(value) {
-		case "", "0", "false":
-			result = false
-		}
-	}
-
-	return result
-
+	b, _ := strconv.ParseBool(String(value))
+	return b
 }
