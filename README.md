@@ -2,9 +2,10 @@
 
 *Convenient* functions for converting between common Go datatypes.
 
-If any conversion cannot be done, a zero value will be always returned.
+This is an *experimental package* it avoids error handling and reporting, if
+any conversion cannot be done, a zero value will be always returned.
 
-This is an *experimental package* and it avoids error handling on purpose.
+Life is too short for properly catching trivial conversion errors.
 
 ## Installing
 
