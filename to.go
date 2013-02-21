@@ -383,3 +383,50 @@ func Bool(value interface{}) bool {
 	b, _ := strconv.ParseBool(String(value))
 	return b
 }
+
+func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
+	switch t {
+
+	case reflect.Uint64:
+		return Uint64(value), nil
+
+	case reflect.Uint32:
+		return Uint32(value), nil
+
+	case reflect.Uint16:
+		return Uint16(value), nil
+
+	case reflect.Uint8:
+		return Uint8(value), nil
+
+	case reflect.Uint:
+		return Uint(value), nil
+
+	case reflect.Int64:
+		return Int64(value), nil
+
+	case reflect.Int32:
+		return Int32(value), nil
+
+	case reflect.Int16:
+		return Int16(value), nil
+
+	case reflect.Int8:
+		return Int8(value), nil
+
+	case reflect.Int:
+		return Int(value), nil
+
+	case reflect.Float64:
+		return Float64(value), nil
+
+	case reflect.Float32:
+		return Float32(value), nil
+
+	case reflect.Bool:
+		return Bool(value), nil
+
+	}
+
+	return nil, fmt.Errorf("Could not convert %s into %s.", reflect.TypeOf(value).Kind(), t)
+}

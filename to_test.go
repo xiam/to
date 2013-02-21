@@ -2,6 +2,7 @@ package to
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -199,6 +200,21 @@ func TestMap(t *testing.T) {
 	}
 }
 
+func TestConvert(t *testing.T) {
+	b, _ := Convert(1, reflect.Bool)
+
+	if b.(bool) != true {
+		t.Fatalf("Test failed.")
+	}
+
+	i, _ := Convert("456", reflect.Int64)
+
+	if i.(int64) != int64(456) {
+		t.Fatalf("Test failed.")
+	}
+
+}
+
 func BenchmarkFmtInt(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		fmt.Sprintf("%v", 1)
@@ -248,5 +264,15 @@ func BenchmarkList(b *testing.B) {
 	}
 	for i := 0; i < b.N; i++ {
 		List(mylist)
+	}
+}
+
+func BenchmarkConvert(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := Convert("567", reflect.Int64)
+		if err != nil {
+			b.Fatalf("Test failed.")
+			return
+		}
 	}
 }
