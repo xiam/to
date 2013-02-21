@@ -9,7 +9,7 @@ Life is too short for properly catching trivial conversion errors.
 
 ## Installing
 
-```
+```sh
 go get github.com/gosexy/to
 ```
 
@@ -17,13 +17,13 @@ go get github.com/gosexy/to
 
 Import the package
 
-```
+```go
 import "github.com/gosexy/to"
 ```
 
 Convert something
 
-```
+```go
 i, err := to.Convert("567", reflect.Int64)
 // 567, nil
 
