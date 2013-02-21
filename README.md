@@ -24,6 +24,9 @@ import "github.com/gosexy/to"
 Convert something
 
 ```
+i, err := to.Convert("567", reflect.Int64)
+// 567, nil
+
 a := to.String(1)
 // "1"
 b := to.String(1.1)
