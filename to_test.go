@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestInteger(t *testing.T) {
+func TestToString(t *testing.T) {
 
 	if String(0) != "0" {
 		t.Fatalf("Test failed.")
@@ -33,6 +33,38 @@ func TestInteger(t *testing.T) {
 		t.Fatalf("Test failed.")
 	}
 	if String(uint64(18446744073709551615)) != "18446744073709551615" {
+		t.Fatalf("Test failed.")
+	}
+
+}
+
+func TestToBytes(t *testing.T) {
+
+	if String(Bytes(0)) != "0" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(-0)) != "0" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(1)) != "1" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(-1)) != "-1" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(10)) != "10" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(-10)) != "-10" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(int64(9223372036854775807))) != "9223372036854775807" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(int64(-9223372036854775807))) != "-9223372036854775807" {
+		t.Fatalf("Test failed.")
+	}
+	if String(Bytes(uint64(18446744073709551615))) != "18446744073709551615" {
 		t.Fatalf("Test failed.")
 	}
 
@@ -233,9 +265,21 @@ func BenchmarkString(b *testing.B) {
 	}
 }
 
+func BenchmarkBytes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Bytes(1)
+	}
+}
+
 func BenchmarkStringFloat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		String(1.1)
+	}
+}
+
+func BenchmarkBytesFloat(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Bytes(1.1)
 	}
 }
 

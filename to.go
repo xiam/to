@@ -110,6 +110,66 @@ func complex128ToBytes(v complex128) []byte {
 	return buf
 }
 
+func Bytes(val interface{}) []byte {
+	if val == nil {
+		return []byte{}
+	}
+
+	switch val.(type) {
+
+	case int:
+		return int64ToBytes(int64(val.(int)))
+
+	case int8:
+		return int64ToBytes(int64(val.(int8)))
+	case int16:
+		return int64ToBytes(int64(val.(int16)))
+	case int32:
+		return int64ToBytes(int64(val.(int32)))
+	case int64:
+		return int64ToBytes(val.(int64))
+
+	case uint:
+		return uint64ToBytes(uint64(val.(uint)))
+	case uint8:
+		return uint64ToBytes(uint64(val.(uint8)))
+	case uint16:
+		return uint64ToBytes(uint64(val.(uint16)))
+	case uint32:
+		return uint64ToBytes(uint64(val.(uint32)))
+	case uint64:
+		return uint64ToBytes(val.(uint64))
+
+	case float32:
+		return float32ToBytes(val.(float32))
+	case float64:
+		return float64ToBytes(val.(float64))
+
+	case complex128:
+		return complex128ToBytes(val.(complex128))
+	case complex64:
+		return complex128ToBytes(complex128(val.(complex64)))
+
+	case bool:
+		if val.(bool) == true {
+			return []byte("true")
+		} else {
+			return []byte("false")
+		}
+
+	case string:
+		return []byte(val.(string))
+
+	case []byte:
+		return val.([]byte)
+
+	default:
+		return []byte(fmt.Sprintf("%v", val))
+	}
+
+	panic("Not reached.")
+}
+
 func String(val interface{}) string {
 	var buf []byte
 
