@@ -385,6 +385,16 @@ func Bool(value interface{}) bool {
 }
 
 func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
+
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Slice:
+		switch t {
+		case reflect.Slice:
+		default:
+			return nil, fmt.Errorf("Could not convert slice into non-slice.")
+		}
+	}
+
 	switch t {
 
 	case reflect.Uint64:
@@ -425,6 +435,9 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 
 	case reflect.Bool:
 		return Bool(value), nil
+
+	case reflect.Interface:
+		return value, nil
 
 	}
 
