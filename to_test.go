@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestToString(t *testing.T) {
@@ -245,6 +246,72 @@ func TestConvert(t *testing.T) {
 		t.Fatalf("Test failed.")
 	}
 
+}
+
+func TestTimeDuration(t *testing.T) {
+	if Duration(123) != time.Duration(123) {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("12s37ms") != time.Second*12+time.Millisecond*37 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37") != time.Hour*13+time.Minute*37 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("-13:37") != -(time.Hour*13 + time.Minute*37) {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37:21") != time.Hour*13+time.Minute*37+time.Second*21 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37:21.456123") != time.Hour*13+time.Minute*37+time.Second*21+time.Microsecond*456123 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37:21.4561231") != time.Hour*13+time.Minute*37+time.Second*21+456123100 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37:21.456123789") != time.Hour*13+time.Minute*37+time.Second*21+time.Nanosecond*456123789 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("13:37:21.456123789999") != time.Hour*13+time.Minute*37+time.Second*21+time.Nanosecond*456123789 {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("-13:37:21.456123789999") != -(time.Hour*13 + time.Minute*37 + time.Second*21 + time.Nanosecond*456123789) {
+		t.Fatalf("Test failed.")
+	}
+	if Duration("abc") != time.Duration(0) {
+		t.Fatalf("Test failed.")
+	}
+}
+
+func TestDate(t *testing.T) {
+	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.UTC).Equal(Time("2012-03-24")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("2012-03-24 23:13:37")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.UTC).Equal(Time("2012-03-24 23:13:37.000000123")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("03/24/2012 23:13:37")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.UTC).Equal(Time("03/24/12 23:13:37.000000123")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("24/Mar/2012 23:13:37")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.UTC).Equal(Time("Mar 24, 2012")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 123000000, time.UTC).Equal(Time("2012-03-24T23:13:37.123Z")) != true {
+		t.Fatalf("Test failed.")
+	}
+	if time.Date(2012, 3, 24, 23, 13, 37, 123456789, time.UTC).Equal(Time("2012-03-24T23:13:37.123456789Z")) != true {
+		t.Fatalf("Test failed.")
+	}
 }
 
 func BenchmarkFmtInt(b *testing.B) {

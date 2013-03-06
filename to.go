@@ -32,16 +32,132 @@
 package to
 
 import (
-	//"github.com/gosexy/sugar"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
+	"time"
 )
 
 const (
 	digits     = "0123456789"
 	uintbuflen = 20
 )
+
+var strToTimeFormats = []string{
+	"2006-01-02",
+	"2006-01-02 15:04",
+	"2006-01-02 15:04:05",
+	"2006-01-02 15:04:05.000000000",
+	"2006-01-02T15:04:05",
+	"2006-01-02T15:04",
+	"2006-01-02T15:04:05.000000000",
+	"01/02/2006",
+	"01/02/2006 15:04",
+	"01/02/2006 15:04:05",
+	"01/02/2006 15:04:05.000000000",
+	"01/02/06",
+	"01/02/06 15:04",
+	"01/02/06 15:04:05",
+	"01/02/06 15:04:05.000000000",
+	"Mon Jan _2 15:04:05.000000000 -0700 MST 2006",
+	"_2/Jan/2006 15:04:05",
+	"Jan _2, 2006",
+	time.ANSIC,
+	time.UnixDate,
+	time.RubyDate,
+	time.RFC822,
+	time.RFC822Z,
+	time.RFC850,
+	time.RFC1123,
+	time.RFC1123Z,
+	time.RFC3339,
+	time.RFC3339Nano,
+	time.Kitchen,
+	time.Stamp,
+	time.StampMilli,
+	time.StampMicro,
+	time.StampNano,
+}
+
+var strToDurationMatches = map[*regexp.Regexp]func([][][]byte) (time.Duration, error){
+	regexp.MustCompile(`^(\-?\d+):(\d+)$`): func(m [][][]byte) (time.Duration, error) {
+		sign := 1
+
+		hrs := time.Hour * time.Duration(Int64(m[0][1]))
+
+		if hrs < 0 {
+			hrs = -1 * hrs
+			sign = -1
+		}
+
+		min := time.Minute * time.Duration(Int64(m[0][2]))
+
+		return time.Duration(sign) * (hrs + min), nil
+	},
+	regexp.MustCompile(`^(\-?\d+):(\d+):(\d+)$`): func(m [][][]byte) (time.Duration, error) {
+		sign := 1
+
+		hrs := time.Hour * time.Duration(Int64(m[0][1]))
+
+		if hrs < 0 {
+			hrs = -1 * hrs
+			sign = -1
+		}
+
+		min := time.Minute * time.Duration(Int64(m[0][2]))
+		sec := time.Second * time.Duration(Int64(m[0][3]))
+
+		return time.Duration(sign) * (hrs + min + sec), nil
+	},
+	regexp.MustCompile(`^(\-?\d+):(\d+):(\d+).(\d+)$`): func(m [][][]byte) (time.Duration, error) {
+		sign := 1
+
+		hrs := time.Hour * time.Duration(Int64(m[0][1]))
+
+		if hrs < 0 {
+			hrs = -1 * hrs
+			sign = -1
+		}
+
+		min := time.Minute * time.Duration(Int64(m[0][2]))
+		sec := time.Second * time.Duration(Int64(m[0][3]))
+		lst := m[0][4]
+
+		for len(lst) < 9 {
+			lst = append(lst, '0')
+		}
+		lst = lst[0:9]
+
+		return time.Duration(sign) * (hrs + min + sec + time.Duration(Int64(lst))), nil
+	},
+}
+
+func strToDuration(v string) time.Duration {
+
+	var err error
+	var d time.Duration
+
+	d, err = time.ParseDuration(v)
+
+	if err == nil {
+		return d
+	}
+
+	b := []byte(v)
+
+	for re, fn := range strToDurationMatches {
+		m := re.FindAllSubmatch(b, -1)
+		if m != nil {
+			r, err := fn(m)
+			if err == nil {
+				return r
+			}
+		}
+	}
+
+	return time.Duration(0)
+}
 
 func uint64ToBytes(v uint64) []byte {
 	buf := make([]byte, uintbuflen)
@@ -108,6 +224,49 @@ func complex128ToBytes(v complex128) []byte {
 	buf = append(i, []byte{'i', ')'}...)
 
 	return buf
+}
+
+func Time(val interface{}) time.Time {
+	switch t := val.(type) {
+	// We could use this later.
+	default:
+		s := String(t)
+		for _, format := range strToTimeFormats {
+			r, err := time.Parse(format, s)
+			if err == nil {
+				return r
+			}
+		}
+	}
+	return time.Time{}
+}
+
+func Duration(val interface{}) time.Duration {
+	switch t := val.(type) {
+	case int:
+		return time.Duration(int64(t))
+	case int8:
+		return time.Duration(int64(t))
+	case int16:
+		return time.Duration(int64(t))
+	case int32:
+		return time.Duration(int64(t))
+	case int64:
+		return time.Duration(t)
+	case uint:
+		return time.Duration(int64(t))
+	case uint8:
+		return time.Duration(int64(t))
+	case uint16:
+		return time.Duration(int64(t))
+	case uint32:
+		return time.Duration(int64(t))
+	case uint64:
+		return time.Duration(int64(t))
+	default:
+		return strToDuration(String(val))
+	}
+	panic("Reached")
 }
 
 func Bytes(val interface{}) []byte {
@@ -326,12 +485,12 @@ func Int64(val interface{}) int64 {
 		} else {
 			i = int64(0)
 		}
-	case string:
-		i, _ = strconv.ParseInt(val.(string), 10, 64)
 	case float32:
 		i = int64(val.(float32))
 	case float64:
 		i = int64(val.(float64))
+	default:
+		i, _ = strconv.ParseInt(String(val), 10, 64)
 	}
 
 	return i
@@ -449,6 +608,12 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Slice:
 		switch t {
+		case reflect.String:
+			if reflect.TypeOf(value).Elem().Kind() == reflect.Uint8 {
+				return string(value.([]byte)), nil
+			} else {
+				return String(value), nil
+			}
 		case reflect.Slice:
 		default:
 			return nil, fmt.Errorf("Could not convert slice into non-slice.")
@@ -456,6 +621,9 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 	}
 
 	switch t {
+
+	case reflect.String:
+		return String(value), nil
 
 	case reflect.Uint64:
 		return Uint64(value), nil
