@@ -1,16 +1,22 @@
-# gosexy/to
+# menteslibres.net/gosexy/to
 
 *Convenient* functions for converting between common Go datatypes.
 
-This is an *experimental package* it avoids error handling and reporting, if
-any conversion cannot be done, a zero value will be always returned.
+This is an *experimental package* it aims to be as quiet as possible so it
+avoids error handling **on pourpose**, if any conversion is not possible and
+can't be done, a zero value is always guaranteed to be returned.
+
+Please be aware that not every Go program can benefit from avoiding conversion
+errors, I've found that dealing with user input or JSON data are scenarios
+where having a zero value is more convenient than trying to make the user feed
+appropriate data.
 
 Life is too short for properly catching trivial conversion errors.
 
 ## Installing
 
 ```sh
-go get github.com/gosexy/to
+go get menteslibres.net/gosexy/to
 ```
 
 ## Usage
@@ -18,7 +24,7 @@ go get github.com/gosexy/to
 Import the package
 
 ```go
-import "github.com/gosexy/to"
+import "menteslibres.net/gosexy/to"
 ```
 
 Convert something
@@ -34,16 +40,16 @@ b := to.String(1.1)
 c := to.String(true)
 // "true"
 
-a := to.Int("1")
+a := to.Int64("1")
 // 1
-b := to.Int("-1")
+b := to.Int64("-1")
 // -1
-b := to.Int("")
+b := to.Int64("")
 // 0
 
-a := to.Float32("1.4")
+a := to.Float64("1.4")
 // 1.4
-b := to.Float32("A")
+b := to.Float64("A")
 // 0.0
 
 a := to.Bool("true")

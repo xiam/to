@@ -1,3 +1,26 @@
+/*
+  Copyright (c) 2012-2013 José Carlos Nieto, http://xiam.menteslibres.org/
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 package to
 
 import (
@@ -132,37 +155,37 @@ func TestIntegers(t *testing.T) {
 	if Int64(-1) != int64(-1) {
 		t.Fatalf("Test failed.")
 	}
-	if Int32(true) != int32(1) {
+	if int32(Int64(true)) != int32(1) {
 		t.Fatalf("Test failed.")
 	}
-	if Int32(false) != int32(0) {
+	if int32(Int64(false)) != int32(0) {
 		t.Fatalf("Test failed.")
 	}
-	if Int32("123") != int32(123) {
+	if int32(Int64("123")) != int32(123) {
 		t.Fatalf("Test failed.")
 	}
-	if Uint32("123") != uint32(123) {
+	if uint32(Uint64("123")) != uint32(123) {
 		t.Fatalf("Test failed.")
 	}
-	if Uint32("0") != uint32(0) {
+	if uint32(Uint64("0")) != uint32(0) {
 		t.Fatalf("Test failed.")
 	}
-	if Uint(5) != uint(5) {
+	if uint(Uint64(5)) != uint(5) {
 		t.Fatalf("Test failed.")
 	}
-	if Uint(5.1) != uint(5) {
+	if uint(Uint64(5.1)) != uint(5) {
 		t.Fatalf("Test failed.")
 	}
-	if Int8(6.1) != int8(6) {
+	if int8(Uint64(6.1)) != int8(6) {
 		t.Fatalf("Test failed.")
 	}
 }
 
 func TestFloat(t *testing.T) {
-	if Float32(1) != float32(1) {
+	if float32(Float64(1)) != float32(1) {
 		t.Fatalf("Test failed.")
 	}
-	if Float32(1.2) != float32(1.2) {
+	if float32(Float64(1.2)) != float32(1.2) {
 		t.Fatalf("Test failed.")
 	}
 	if Float64(-11.2) != float64(-11.2) {
@@ -191,10 +214,13 @@ func TestBool(t *testing.T) {
 	}
 }
 
+/*
+// Delayed until Go 1.1
 func TestList(t *testing.T) {
 	mylist := []string{
 		"a", "b", "c", "d", "e",
 	}
+
 	res := List(mylist)
 	if res[2].(string) != "c" {
 		t.Fatalf("Test failed.")
@@ -217,6 +243,7 @@ func TestList(t *testing.T) {
 	}
 }
 
+// Delayed until Go 1.1
 func TestMap(t *testing.T) {
 	mymap := map[int]string{
 		1: "a",
@@ -232,6 +259,7 @@ func TestMap(t *testing.T) {
 		t.Fatalf("Test failed.")
 	}
 }
+*/
 
 func TestConvert(t *testing.T) {
 	b, _ := Convert(1, reflect.Bool)
@@ -338,6 +366,12 @@ func BenchmarkBytes(b *testing.B) {
 	}
 }
 
+func BenchmarkStringInt(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		String(1)
+	}
+}
+
 func BenchmarkStringFloat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		String(1.1)
@@ -356,6 +390,7 @@ func BenchmarkBool(b *testing.B) {
 	}
 }
 
+/*
 func BenchmarkMap(b *testing.B) {
 	mymap := map[int]string{
 		1: "a",
@@ -377,6 +412,7 @@ func BenchmarkList(b *testing.B) {
 		List(mylist)
 	}
 }
+*/
 
 func BenchmarkConvert(b *testing.B) {
 	for i := 0; i < b.N; i++ {
