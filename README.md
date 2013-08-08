@@ -93,7 +93,8 @@ Now, an important question: how fast is this library compared to standard
 methods, like the `fmt` or `strconv` packages?
 
 It is, of course, a little slower that `strconv` methods but it is faster than
-`fmt`, so it's somewhat in the middle. You can test it by yourself:
+`fmt`, so it provides an acceptable speed for most projects. You can test it by
+yourself:
 
 ```sh
 $ go test -test.bench=.
