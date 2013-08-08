@@ -1,22 +1,32 @@
-# menteslibres.net/gosexy/to
+# gosexy/to
 
-*Convenient* functions for converting between common Go datatypes.
+*Convenient* functions for converting values between common Go datatypes.
 
-This is an *experimental package* it aims to be as quiet as possible so it
-avoids error handling **on pourpose**, if any conversion is not possible and
-can't be done, a zero value is always guaranteed to be returned.
+What if, instead of producing errors because your (human) user did not feed
+correctly formatted data into your program, you try to make your code get over
+it and keep going? Remember that, for any *sane* human, the string `"5"` is
+exactly the same thing as the uint `5` (or was it a `uint64`?) and a *number*
+could be "12.34", even if your program expects only integers.
 
-Please be aware that not every Go program can benefit from avoiding conversion
-errors, I've found that dealing with user input or JSON data are scenarios
-where having a zero value is more convenient than trying to make the user feed
-appropriate data.
+Life is too short for properly catching trivial conversion errors and for
+bothering users with silly computer details, such as the difference between
+`"123"` and `123`.
 
-Life is too short for properly catching trivial conversion errors.
+This package allows quick conversions between Go datatypes, when any conversion
+seems unreasonable, a [zero value][3] of the expected type is always guaranteed.
 
-## Installing
+Please be aware that this package does not consider conversion errors to be
+important enough to be returned or handled, if some conversion error happens it
+instead returns the [zero value][3] with no additional drama. If you're not
+working with human provided data, fuzzy input or if you prefer not to ignore
+any error in your program, you'd better use the standard Go packages for
+conversion, such as [strconv][4] or even [fmt][5], they may be better suited
+for the task.
+
+## Installation
 
 ```sh
-go get menteslibres.net/gosexy/to
+go get -u menteslibres.net/gosexy/to
 ```
 
 ## Usage
@@ -27,42 +37,89 @@ Import the package
 import "menteslibres.net/gosexy/to"
 ```
 
-Convert something
+Use the available `to` functions to convert a `float64` into a `string`:
 
 ```go
-i, err := to.Convert("567", reflect.Int64)
-// 567, nil
-
-a := to.String(1)
-// "1"
-b := to.String(1.1)
-// "1.1"
-c := to.String(true)
-// "true"
-
-a := to.Int64("1")
-// 1
-b := to.Int64("-1")
-// -1
-b := to.Int64("")
-// 0
-
-a := to.Float64("1.4")
-// 1.4
-b := to.Float64("A")
-// 0.0
-
-a := to.Bool("true")
-// true
-b := to.Bool("f")
-// false
+// "1.23"
+s := to.String(1.23)
 ```
+
+Or a `bool` into `string`:
+
+```go
+// "true"
+s := to.String(true)
+```
+
+What about the other way around? `string` to `float64` and `string` to `bool`.
+
+```go
+// 1.23
+f := to.Float64("1.23")
+
+// true
+b := to.Bool("true")
+```
+
+Note that this package only provides `to.Uint64()`, `to.Int64()` and
+`to.Float64()` but no `to.Uint8()`, `to.Uint()` or `to.Float32()` functions, if
+you'd like to produce a `float32` instead of a `float64` you'd first use
+`to.Float64()` and then cast the output using `float32()`.
+
+```go
+f32 := float32(to.Float64("12.34"))
+```
+
+There is another important function, `to.Convert()` that accepts any value
+(`interface{}`) as first argument and also a `reflect.Kind`, as second, that
+defines the data type the first argument will be converted to, this is also
+the only function that returns an `error` value.
+
+```go
+val, err := to.Convert("12345", reflect.Int64)
+```
+
+Date formats and durations are also handled, you can use many fuzzy date formats
+and they would be converted into `time.Time` values.
+
+```go
+timeVal = to.Time("2012-03-24")
+timeVal = to.Time("Mar 24, 2012")
+
+durationVal := to.Duration("12s37ms")
+```
+
+Now, an important question: how fast is this library compared to standard
+methods, like the `fmt` or `strconv` packages?
+
+It is, of course, a little slower that `strconv` methods but it is faster than
+`fmt`, so it's somewhat in the middle. You can test it by yourself:
+
+```sh
+$ go test -test.bench=.
+PASS
+BenchmarkFmtIntToString           5000000               547 ns/op
+BenchmarkFmtFloatToString         2000000               914 ns/op
+BenchmarkStrconvIntToString      10000000               142 ns/op
+BenchmarkStrconvFloatToString     1000000              1155 ns/op
+BenchmarkIntToString             10000000               325 ns/op
+BenchmarkFloatToString            2000000               873 ns/op
+BenchmarkIntToBytes              10000000               198 ns/op
+BenchmarkBoolToString            50000000                48.0 ns/op
+BenchmarkFloatToBytes             2000000               773 ns/op
+BenchmarkIntToBool                5000000               403 ns/op
+BenchmarkStringToTime             1000000              1063 ns/op
+BenchmarkConvert                 10000000               199 ns/op
+ok      menteslibres.net/gosexy/to      27.670s
+```
+
+See the [docs][1] for a full reference of all the available `to` methods.
 
 ## License
 
 This is Open Source released under the terms of the MIT License:
 
-> Copyright (c) 2013 José Carlos Nieto, http://xiam.menteslibres.org/
+> Copyright (c) 2013 José Carlos Nieto, https://menteslibres.net/xiam
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
@@ -82,3 +139,9 @@ This is Open Source released under the terms of the MIT License:
 > LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[1]: http://godoc.org/menteslibres.net/gosexy/to
+[2]: https://menteslibres.net/gosexy/to
+[3]: http://golang.org/ref/spec#The_zero_value
+[4]: http://golang.org/pkg/strconv/
+[5]: http://golang.org/pkg/fmt/

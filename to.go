@@ -541,8 +541,8 @@ func Uint64(val interface{}) uint64 {
 			return uint64(1)
 		}
 		return uint64(0)
-	case string:
-		i, _ := strconv.ParseUint(val.(string), 10, 64)
+	default:
+		i, _ := strconv.ParseUint(String(val), 10, 64)
 		return i
 	}
 

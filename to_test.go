@@ -26,6 +26,7 @@ package to
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -274,6 +275,24 @@ func TestConvert(t *testing.T) {
 		t.Fatalf("Test failed.")
 	}
 
+	i, _ = Convert("0", reflect.Int64)
+
+	if i.(int64) != int64(0) {
+		t.Fatalf("Test failed.")
+	}
+
+	ui, _ := Convert("456", reflect.Uint64)
+
+	if ui.(uint64) != uint64(456) {
+		t.Fatalf("Test failed.")
+	}
+
+	ui, _ = Convert("0", reflect.Uint64)
+
+	if ui.(uint64) != uint64(0) {
+		t.Fatalf("Test failed.")
+	}
+
 }
 
 func TestTimeDuration(t *testing.T) {
@@ -342,51 +361,69 @@ func TestDate(t *testing.T) {
 	}
 }
 
-func BenchmarkFmtInt(b *testing.B) {
+func BenchmarkFmtIntToString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fmt.Sprintf("%v", 1)
+		fmt.Sprintf("%s", 1)
 	}
 }
 
-func BenchmarkFmtFloat(b *testing.B) {
+func BenchmarkFmtFloatToString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fmt.Sprintf("%v", 1.1)
+		fmt.Sprintf("%s", 1.1)
 	}
 }
 
-func BenchmarkString(b *testing.B) {
+func BenchmarkStrconvIntToString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		strconv.Itoa(1)
+	}
+}
+
+func BenchmarkStrconvFloatToString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		strconv.FormatFloat(1.1, 'f', 2, 64)
+	}
+}
+
+func BenchmarkIntToString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		String(1)
 	}
 }
 
-func BenchmarkBytes(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		Bytes(1)
-	}
-}
-
-func BenchmarkStringInt(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		String(1)
-	}
-}
-
-func BenchmarkStringFloat(b *testing.B) {
+func BenchmarkFloatToString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		String(1.1)
 	}
 }
 
-func BenchmarkBytesFloat(b *testing.B) {
+func BenchmarkIntToBytes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Bytes(1)
+	}
+}
+
+func BenchmarkBoolToString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		String(true)
+	}
+}
+
+func BenchmarkFloatToBytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Bytes(1.1)
 	}
 }
 
-func BenchmarkBool(b *testing.B) {
+func BenchmarkIntToBool(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Bool(1)
+	}
+}
+
+func BenchmarkStringToTime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Time("2012-03-24")
 	}
 }
 
