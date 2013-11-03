@@ -238,7 +238,7 @@ func Time(val interface{}) time.Time {
 	default:
 		s := String(t)
 		for _, format := range strToTimeFormats {
-			r, err := time.Parse(format, s)
+			r, err := time.ParseInLocation(format, s, time.Local)
 			if err == nil {
 				return r
 			}

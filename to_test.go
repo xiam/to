@@ -332,25 +332,25 @@ func TestTimeDuration(t *testing.T) {
 }
 
 func TestDate(t *testing.T) {
-	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.UTC).Equal(Time("2012-03-24")) != true {
+	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.Local).Equal(Time("2012-03-24")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("2012-03-24 23:13:37")) != true {
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.Local).Equal(Time("2012-03-24 23:13:37")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.UTC).Equal(Time("2012-03-24 23:13:37.000000123")) != true {
+	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.Local).Equal(Time("2012-03-24 23:13:37.000000123")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("03/24/2012 23:13:37")) != true {
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.Local).Equal(Time("03/24/2012 23:13:37")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.UTC).Equal(Time("03/24/12 23:13:37.000000123")) != true {
+	if time.Date(2012, 3, 24, 23, 13, 37, 123, time.Local).Equal(Time("03/24/12 23:13:37.000000123")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.UTC).Equal(Time("24/Mar/2012 23:13:37")) != true {
+	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.Local).Equal(Time("24/Mar/2012 23:13:37")) != true {
 		t.Fatalf("Test failed.")
 	}
-	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.UTC).Equal(Time("Mar 24, 2012")) != true {
+	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.Local).Equal(Time("Mar 24, 2012")) != true {
 		t.Fatalf("Test failed.")
 	}
 	if time.Date(2012, 3, 24, 23, 13, 37, 123000000, time.UTC).Equal(Time("2012-03-24T23:13:37.123Z")) != true {
