@@ -34,6 +34,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -47,40 +48,58 @@ const (
 	uintbuflen = 20
 )
 
+const (
+	KindTime reflect.Kind = iota + 1000000000
+	KindDuration
+)
+
+type FlagsTZ uint
+
+const (
+	// flags of TimeZone
+	NoneTZ FlagsTZ = iota
+	NumTZ
+	AbbrTZ
+	NumAbbrTZ = NumTZ | AbbrTZ
+)
+
+// IF modify, Do not forget to change TimeTZ
 var strToTimeFormats = []string{
-	"2006-01-02",
-	"2006-01-02 15:04",
-	"2006-01-02 15:04:05",
-	"2006-01-02 15:04:05.000000000",
-	"2006-01-02T15:04:05",
-	"2006-01-02T15:04",
-	"2006-01-02T15:04:05.000000000",
-	"01/02/2006",
-	"01/02/2006 15:04",
-	"01/02/2006 15:04:05",
-	"01/02/2006 15:04:05.000000000",
+	// follow with NumTZ and AbbrTZ
+	"2006-01-02 15:04:05 Z0700 MST",
+	"2006-01-02 15:04:05 Z07:00 MST",
+	"2006-01-02 15:04:05 Z0700 -0700",    // Time.String() for with NumTZ and without AbbrTZ
+	"Mon Jan _2 15:04:05 -0700 MST 2006", // "Mon Jan _2 15:04:05 -0700 MST 2006"
+	// follow with NumTZ ,
+	time.RFC822Z,                 // "02 Jan 06 15:04 -0700"
+	time.RFC3339,                 // "2006-01-02T15:04:05Z07:00", RFC3339Nano
+	"2006-01-02 15:04:05 -0700",  // "2006-01-02 15:04:05 -0700"
+	"2006-01-02 15:04:05 Z07:00", // "2006-01-02 15:04:05 Z07:00"
+	time.RubyDate,                // "Mon Jan 02 15:04:05 -0700 2006"
+	time.RFC1123Z,                // "Mon, 02 Jan 2006 15:04:05 -0700"
+	// follow with AbbrTZ, ParseInLocation use time.Local
+	time.RFC822,               // "02 Jan 06 15:04 MST",
+	"2006-01-02 15:04:05 MST", // "2006-01-02 15:04:05 MST",
+	time.UnixDate,             // "Mon Jan _2 15:04:05 MST 2006",
+	time.RFC1123,              // "Mon, 02 Jan 2006 15:04:05 MST",
+	time.RFC850,               // "Monday, 02-Jan-06 15:04:05 MST",
+	// follow NoneTZ, ParseInLocation use time.Local
+	time.Kitchen, //"3:04PM"
 	"01/02/06",
-	"01/02/06 15:04",
-	"01/02/06 15:04:05",
-	"01/02/06 15:04:05.000000000",
-	"Mon Jan _2 15:04:05.000000000 -0700 MST 2006",
-	"_2/Jan/2006 15:04:05",
+	"2006-01-02",
+	"01/02/2006",
 	"Jan _2, 2006",
-	time.ANSIC,
-	time.UnixDate,
-	time.RubyDate,
-	time.RFC822,
-	time.RFC822Z,
-	time.RFC850,
-	time.RFC1123,
-	time.RFC1123Z,
-	time.RFC3339,
-	time.RFC3339Nano,
-	time.Kitchen,
-	time.Stamp,
-	time.StampMilli,
-	time.StampMicro,
-	time.StampNano,
+	"01/02/06 15:04",
+	time.Stamp, // "Jan _2 15:04:05", time.StampMilli, time.StampMicro, time.StampNano,
+	time.ANSIC, // "Mon Jan _2 15:04:05 2006"
+	"2006-01-02 15:04",
+	"2006-01-02T15:04",
+	"01/02/2006 15:04",
+	"01/02/06 15:04:05",    // "01/02/06 15:04:05.000000000",
+	"01/02/2006 15:04:05",  // "01/02/2006 15:04:05.000000000",
+	"2006-01-02 15:04:05",  // "2006-01-02 15:04:05"
+	"2006-01-02T15:04:05",  // "2006-01-02T15:04:05.000000000",
+	"_2/Jan/2006 15:04:05", // "_2/Jan/2006 15:04:05"
 }
 
 var strToDurationMatches = map[*regexp.Regexp]func([][][]byte) (time.Duration, error){
@@ -233,18 +252,45 @@ func complex128ToBytes(v complex128) []byte {
 	Converts a date string into a time.Time value, several date formats are tried.
 */
 func Time(val interface{}) time.Time {
+	t, _ := TimeTZ(val)
+	return t
+}
+
+/*
+	Converts a date string into a time.Time value, several date formats are tried.
+	returns time.Time and FlagsTZ.
+*/
+func TimeTZ(val interface{}) (r time.Time, flag FlagsTZ) {
+
 	switch t := val.(type) {
 	// We could use this later.
 	default:
 		s := String(t)
-		for _, format := range strToTimeFormats {
-			r, err := time.ParseInLocation(format, s, time.Local)
+		l := len(s)
+		noNano := strings.Index(s, ".") == -1
+		var err error
+		for i, format := range strToTimeFormats {
+			if noNano && len(format) < l {
+				continue
+			}
+			if i > 10 { // without NumTZ
+				r, err = time.ParseInLocation(format, s, time.Local)
+			} else {
+				r, err = time.Parse(format, s)
+			}
 			if err == nil {
-				return r
+				if i < 4 {
+					flag = NumAbbrTZ
+				} else if i < 10 {
+					flag = NumTZ
+				} else if i < 15 {
+					flag = AbbrTZ
+				}
+				return
 			}
 		}
 	}
-	return time.Time{}
+	return time.Time{}, NoneTZ
 }
 
 /*
@@ -669,13 +715,11 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 	case reflect.Interface:
 		return value, nil
 
-		/*
-			case timeType.Kind():
-				return Time(value), nil
+	case KindTime:
+		return Time(value), nil
 
-			case durationType.Kind():
-				return Duration(value), nil
-		*/
+	case KindDuration:
+		return Duration(value), nil
 
 	}
 
