@@ -331,43 +331,6 @@ func TestTimeDuration(t *testing.T) {
 	}
 }
 
-func TestTimeTZ(t *testing.T) {
-	if _, tz := TimeTZ("123"); tz != NoneTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37"); tz != NoneTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24T23:13:37"); tz != NoneTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37 MST"); tz != AbbrTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37 -07:00"); tz != NumTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37 +07:00"); tz != NumTZ {
-		t.Fatalf("Test failed.")
-	}
-
-	if _, tz := TimeTZ("2012-03-24 23:13:37 +00:00"); tz != NumTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37 +07:00 MST"); tz != NumAbbrTZ {
-		t.Fatalf("Test failed.")
-	}
-	if _, tz := TimeTZ("2012-03-24 23:13:37 +0700 +0700"); tz != NumAbbrTZ {
-		t.Fatalf("Test failed.")
-	}
-	// How to do?
-	// fmt.Println(TimeTZ("2012-03-24 23:13:37 +0700 -0700"))
-	// output: 2012-03-24 23:13:37 -0700 -0700
-	if _, tz := TimeTZ("2012-03-24 23:13:37 +0700 -0700"); tz != NumAbbrTZ {
-		t.Fatalf("Test failed.")
-	}
-}
-
 func TestDate(t *testing.T) {
 	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.Local).Equal(Time("2012-03-24")) != true {
 		t.Fatalf("Test failed.")
