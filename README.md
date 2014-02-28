@@ -1,27 +1,18 @@
 # gosexy/to
 
-*Convenient* functions for converting values between common Go datatypes.
+*Convenient* functions for converting values between common Go datatypes. For
+Go 1.1+.
 
-What if, instead of producing errors because your (human) user did not feed
-correctly formatted data into your program, you try to make your code get over
-it and keep going? Remember that, for any *sane* human, the string `"5"` is
-exactly the same thing as the uint `5` (or was it a `uint64`?) and a *number*
-could be "12.34", even if your program expects only integers.
+This package ignores errors and allows quick-and-dirty conversions between Go
+datatypes.  When any conversion seems unreasonable a [zero value][3] is used as
+fallback.
 
-Life is too short for properly catching trivial conversion errors and for
-bothering users with silly computer details, such as the difference between
-`"123"` and `123`.
+If you're not working with human provided data, fuzzy input or if you'd rather
+not ignore any error in your program, you should better use the standard Go
+packages for conversion, such as [strconv][4], [fmt][5] or even [standard
+conversion][6] they may be better suited for the task.
 
-This package allows quick conversions between Go datatypes, when any conversion
-seems unreasonable, a [zero value][3] of the expected type is always guaranteed.
-
-Please be aware that this package does not consider conversion errors to be
-important enough to be returned or handled, if some conversion error happens it
-instead returns the [zero value][3] with no additional drama. If you're not
-working with human provided data, fuzzy input or if you prefer not to ignore
-any error in your program, you'd better use the standard Go packages for
-conversion, such as [strconv][4] or even [fmt][5], they may be better suited
-for the task.
+[![Build Status](https://travis-ci.org/gosexy/to.png)](https://travis-ci.org/gosexy/to)
 
 ## Installation
 
@@ -120,7 +111,7 @@ See the [docs][1] for a full reference of all the available `to` methods.
 
 This is Open Source released under the terms of the MIT License:
 
-> Copyright (c) 2013 José Carlos Nieto, https://menteslibres.net/xiam
+> Copyright (c) 2013-2014 José Carlos Nieto, https://menteslibres.net/xiam
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
@@ -146,3 +137,4 @@ This is Open Source released under the terms of the MIT License:
 [3]: http://golang.org/ref/spec#The_zero_value
 [4]: http://golang.org/pkg/strconv/
 [5]: http://golang.org/pkg/fmt/
+[6]: http://golang.org/ref/spec#Conversions
