@@ -335,6 +335,9 @@ func TestDate(t *testing.T) {
 	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.Local).Equal(Time("2012-03-24")) != true {
 		t.Fatalf("Test failed.")
 	}
+	if time.Date(2012, 3, 24, 0, 0, 0, 0, time.Local).Equal(Time("2012/03/24")) != true {
+		t.Fatalf("Test failed.")
+	}
 	if time.Date(2012, 3, 24, 23, 13, 37, 0, time.Local).Equal(Time("2012-03-24 23:13:37")) != true {
 		t.Fatalf("Test failed.")
 	}
