@@ -624,6 +624,11 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 		default:
 			return nil, fmt.Errorf("Could not convert slice into non-slice.")
 		}
+	case reflect.String:
+		switch t {
+		case reflect.Slice:
+			return Bytes(value), nil
+		}
 	}
 
 	switch t {

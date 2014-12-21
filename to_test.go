@@ -24,6 +24,7 @@
 package to
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -290,6 +291,17 @@ func TestConvert(t *testing.T) {
 	ui, _ = Convert("0", reflect.Uint64)
 
 	if ui.(uint64) != uint64(0) {
+		t.Fatalf("Test failed.")
+	}
+
+	var err error
+	var bs interface{}
+
+	if bs, err = Convert("string", reflect.Slice); err != nil {
+		t.Fatal(err)
+	}
+
+	if bytes.Equal(bs.([]byte), []byte("string")) != true {
 		t.Fatalf("Test failed.")
 	}
 
