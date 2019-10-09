@@ -510,6 +510,51 @@ func Int64(val interface{}) int64 {
 }
 
 /*
+	Tries to convert the argument into an golang int. Returns int(0) if any error
+	occurs.
+*/
+func Int(val interface{}) int {
+
+	switch t := val.(type) {
+	case int:
+		return int(t)
+	case int8:
+		return int(t)
+	case int16:
+		return int(t)
+	case int32:
+		return int(t)
+	case int64:
+		return int(t)
+	case uint:
+		return int(t)
+	case uint8:
+		return int(t)
+	case uint16:
+		return int(t)
+	case uint32:
+		return int(t)
+	case uint64:
+		return int(t)
+	case bool:
+		if t == true {
+			return int(1)
+		}
+		return int(0)
+	case float32:
+		return int(t)
+	case float64:
+		return int(t)
+	default:
+		i, _ := strconv.ParseInt(String(val), 10, 64)
+		return int(i)
+	}
+
+	panic("Reached")
+
+}
+
+/*
 	Tries to convert the argument into an uint64. Returns uint64(0) if any error
 	occurs.
 */

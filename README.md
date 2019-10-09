@@ -52,7 +52,7 @@ f := to.Float64("1.23")
 b := to.Bool("true")
 ```
 
-Note that this package only provides `to.Uint64()`, `to.Int64()` and
+Note that this package only provides `to.Uint64()`, `to.Int64()`,`to.Int()` and
 `to.Float64()` but no `to.Uint8()`, `to.Uint()` or `to.Float32()` functions, if
 you'd like to produce a `float32` instead of a `float64` you'd first use
 `to.Float64()` and then cast the output using `float32()`.
