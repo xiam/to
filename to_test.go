@@ -157,6 +157,12 @@ func TestIntegers(t *testing.T) {
 	if Int64(-1) != int64(-1) {
 		t.Fatalf("Test failed.")
 	}
+	if Int(1) != int(1) {
+		t.Fatalf("Test failed.")
+	}
+	if Int(-1) != int(-1) {
+		t.Fatalf("Test failed.")
+	}
 	if int32(Int64(true)) != int32(1) {
 		t.Fatalf("Test failed.")
 	}
