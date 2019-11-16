@@ -1,10 +1,7 @@
 # gosexy/to
 
-*Convenient* functions for converting values between common Go datatypes. For
-Go 1.1+.
-
-This package ignores errors and allows quick-and-dirty conversions between Go
-datatypes.  When any conversion seems unreasonable a [zero value][3] is used as
+The `to` package provides quick-and-dirty conversions between built-in Go data
+types.  When any conversion is unreasonable a [zero value][3] is used as
 fallback.
 
 If you're not working with human provided data, fuzzy input or if you'd rather
@@ -17,7 +14,7 @@ conversion][6] they may be better suited for the task.
 ## Installation
 
 ```sh
-go get -u menteslibres.net/gosexy/to
+go get -u github.com/gosexy/to
 ```
 
 ## Usage
@@ -25,7 +22,7 @@ go get -u menteslibres.net/gosexy/to
 Import the package
 
 ```go
-import "menteslibres.net/gosexy/to"
+import "github.com/gosexy/to"
 ```
 
 Use the available `to` functions to convert a `float64` into a `string`:
@@ -61,48 +58,46 @@ you'd like to produce a `float32` instead of a `float64` you'd first use
 f32 := float32(to.Float64("12.34"))
 ```
 
-There is another important function, `to.Convert()` that accepts any value
-(`interface{}`) as first argument and also a `reflect.Kind`, as second, that
-defines the data type the first argument will be converted to, this is also
-the only function that returns an `error` value.
+There is another important function, `to.Convert()` that receives `interface{}`
+as first argument and `reflect.Kind` as second:
 
 ```go
+// val.(int64) = 12345
 val, err := to.Convert("12345", reflect.Int64)
 ```
 
-Date formats and durations are also handled, you can use many fuzzy date formats
-and they would be converted into `time.Time` values.
+Date formats and durations are matched against common patterns and converted:
 
 ```go
-timeVal = to.Time("2012-03-24")
-timeVal = to.Time("Mar 24, 2012")
+timeVal := to.Time("2012-03-24")
+
+timeVal := to.Time("Mar 24, 2012")
 
 durationVal := to.Duration("12s37ms")
 ```
 
-Now, an important question: how fast is this library compared to standard
-methods, like the `fmt` or `strconv` packages?
+## Benchmarks
 
-It is, of course, a little slower that `strconv` methods but it is faster than
-`fmt`, so it provides an acceptable speed for most projects. You can test it by
-yourself:
+```
+go test -bench=.
 
-```sh
-$ go test -test.bench=.
+goos: linux
+goarch: amd64
+pkg: github.com/gosexy/to
+BenchmarkFmtIntToString-4         	11385524	       105 ns/op
+BenchmarkFmtFloatToString-4       	 2266578	       531 ns/op
+BenchmarkStrconvIntToString-4     	202011031	         5.88 ns/op
+BenchmarkStrconvFloatToString-4   	 2515765	       474 ns/op
+BenchmarkIntToString-4            	16711124	        77.0 ns/op
+BenchmarkFloatToString-4          	 5648437	       214 ns/op
+BenchmarkIntToBytes-4             	19158598	        70.9 ns/op
+BenchmarkBoolToString-4           	167781417	         7.11 ns/op
+BenchmarkFloatToBytes-4           	 6133180	       196 ns/op
+BenchmarkIntToBool-4              	11871574	       106 ns/op
+BenchmarkStringToTime-4           	  211500	      4997 ns/op
+BenchmarkConvert-4                	13155015	        92.9 ns/op
 PASS
-BenchmarkFmtIntToString           5000000               547 ns/op
-BenchmarkFmtFloatToString         2000000               914 ns/op
-BenchmarkStrconvIntToString      10000000               142 ns/op
-BenchmarkStrconvFloatToString     1000000              1155 ns/op
-BenchmarkIntToString             10000000               325 ns/op
-BenchmarkFloatToString            2000000               873 ns/op
-BenchmarkIntToBytes              10000000               198 ns/op
-BenchmarkBoolToString            50000000                48.0 ns/op
-BenchmarkFloatToBytes             2000000               773 ns/op
-BenchmarkIntToBool                5000000               403 ns/op
-BenchmarkStringToTime             1000000              1063 ns/op
-BenchmarkConvert                 10000000               199 ns/op
-ok      menteslibres.net/gosexy/to      27.670s
+ok  	github.com/gosexy/to	17.887s
 ```
 
 See the [docs][1] for a full reference of all the available `to` methods.
@@ -111,7 +106,7 @@ See the [docs][1] for a full reference of all the available `to` methods.
 
 This is Open Source released under the terms of the MIT License:
 
-> Copyright (c) 2013-2014 José Carlos Nieto, https://menteslibres.net/xiam
+> Copyright (c) 2013-today José Nieto, https://xiam.dev
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
@@ -132,8 +127,7 @@ This is Open Source released under the terms of the MIT License:
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[1]: http://godoc.org/menteslibres.net/gosexy/to
-[2]: https://menteslibres.net/gosexy/to
+[1]: http://godoc.org/github.com/gosexy/to
 [3]: http://golang.org/ref/spec#The_zero_value
 [4]: http://golang.org/pkg/strconv/
 [5]: http://golang.org/pkg/fmt/

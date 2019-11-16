@@ -1,32 +1,26 @@
-/*
-  Copyright (c) 2012-2013 José Carlos Nieto, http://xiam.menteslibres.org/
+// Copyright (c) 2012-today José Nieto, https://xiam.dev
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  Permission is hereby granted, free of charge, to any person obtaining
-  a copy of this software and associated documentation files (the
-  "Software"), to deal in the Software without restriction, including
-  without limitation the rights to use, copy, modify, merge, publish,
-  distribute, sublicense, and/or sell copies of the Software, and to
-  permit persons to whom the Software is furnished to do so, subject to
-  the following conditions:
-
-  The above copyright notice and this permission notice shall be
-  included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
-/*
-	A helper package for converting between datatypes.
-
-	If a certain value can not be directly converted to another, the zero value
-	of the destination type is returned instead.
-*/
+// Package to provides quick-and-dirty conversions between built-in Go data
+// types.
 package to
 
 import (
@@ -48,8 +42,8 @@ const (
 )
 
 const (
-	KindTime reflect.Kind = iota + 1000000000
-	KindDuration
+	kindTime reflect.Kind = iota + 1000000000
+	kindDuration
 )
 
 var strToTimeFormats = []string{
@@ -233,9 +227,8 @@ func complex128ToBytes(v complex128) []byte {
 	return buf
 }
 
-/*
-	Converts a date string into a time.Time value, several date formats are tried.
-*/
+// Time converts a date string into a time.Time value, several date formats are
+// tried.
 func Time(val interface{}) time.Time {
 	switch t := val.(type) {
 	// We could use this later.
@@ -251,10 +244,8 @@ func Time(val interface{}) time.Time {
 	return time.Time{}
 }
 
-/*
-	Tries to convert the argument into a time.Duration value. Returns
-	time.Duration(0) if any error occurs.
-*/
+// Duration tries to convert the argument into a time.Duration value. Returns
+// time.Duration(0) if any error occurs.
 func Duration(val interface{}) time.Duration {
 	switch t := val.(type) {
 	case int:
@@ -280,15 +271,13 @@ func Duration(val interface{}) time.Duration {
 	default:
 		return strToDuration(String(val))
 	}
-	panic("Reached")
+
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into a []byte array. Returns []byte{} if any
-	error occurs.
-*/
+// Bytes tries to convert the argument into a []byte array. Returns []byte{} if
+// any error occurs.
 func Bytes(val interface{}) []byte {
-
 	if val == nil {
 		return []byte{}
 	}
@@ -329,7 +318,7 @@ func Bytes(val interface{}) []byte {
 		return complex128ToBytes(complex128(t))
 
 	case bool:
-		if t == true {
+		if t {
 			return []byte("true")
 		}
 		return []byte("false")
@@ -344,12 +333,11 @@ func Bytes(val interface{}) []byte {
 		return []byte(fmt.Sprintf("%v", val))
 	}
 
-	panic("Reached.")
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into a string. Returns "" if any error occurs.
-*/
+// String tries to convert the argument into a string. Returns "" if any error
+// occurs.
 func String(val interface{}) string {
 	var buf []byte
 
@@ -411,63 +399,8 @@ func String(val interface{}) string {
 	return string(buf)
 }
 
-/*
-// Lets wait until Go 1.1
-func List(val interface{}) []interface{} {
-	list := []interface{}{}
-
-	if val == nil {
-		return list
-	}
-
-	switch reflect.TypeOf(val).Kind() {
-	case reflect.Slice:
-		vval := reflect.ValueOf(val)
-
-		size := vval.Len()
-		list := make([]interface{}, size)
-		vlist := reflect.ValueOf(list)
-
-		for i := 0; i < size; i++ {
-			vlist.Index(i).Set(vval.Index(i))
-		}
-
-		return list
-	}
-
-	return list
-}
-
-// Lets wait until Go 1.1
-func Map(val interface{}) map[string]interface{} {
-
-	list := map[string]interface{}{}
-
-	if val == nil {
-		return list
-	}
-
-	switch reflect.TypeOf(val).Kind() {
-	case reflect.Map:
-		vval := reflect.ValueOf(val)
-		vlist := reflect.ValueOf(list)
-
-		for _, vkey := range vval.MapKeys() {
-			key := String(vkey.Interface())
-			vlist.SetMapIndex(reflect.ValueOf(key), vval.MapIndex(vkey))
-		}
-
-		return list
-	}
-
-	return list
-}
-*/
-
-/*
-	Tries to convert the argument into an int64. Returns int64(0) if any error
-	occurs.
-*/
+// Int64 tries to convert the argument into an int64. Returns int64(0) if any
+// error occurs.
 func Int64(val interface{}) int64 {
 
 	switch t := val.(type) {
@@ -505,14 +438,11 @@ func Int64(val interface{}) int64 {
 		return i
 	}
 
-	panic("Reached")
-
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into an golang int. Returns int(0) if any error
-	occurs.
-*/
+// Int tries to convert the argument into an golang int. Returns int(0) if any
+// error occurs.
 func Int(val interface{}) int {
 
 	switch t := val.(type) {
@@ -550,14 +480,11 @@ func Int(val interface{}) int {
 		return int(i)
 	}
 
-	panic("Reached")
-
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into an uint64. Returns uint64(0) if any error
-	occurs.
-*/
+// Uint64 tries to convert the argument into an uint64. Returns uint64(0) if
+// any error occurs.
 func Uint64(val interface{}) uint64 {
 
 	switch t := val.(type) {
@@ -595,14 +522,11 @@ func Uint64(val interface{}) uint64 {
 		return i
 	}
 
-	panic("Reached")
-
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into a float64. Returns float64(0.0) if any
-	error occurs.
-*/
+// Float64 tries to convert the argument into a float64. Returns float64(0.0)
+// if any error occurs.
 func Float64(val interface{}) float64 {
 
 	switch t := val.(type) {
@@ -638,22 +562,21 @@ func Float64(val interface{}) float64 {
 	case string:
 		f, _ := strconv.ParseFloat(val.(string), 64)
 		return f
+	default:
+		return 0
 	}
 
-	panic("Reached")
+	panic("unreachable")
 }
 
-/*
-	Tries to convert the argument into a bool. Returns false if any error occurs.
-*/
+// Bool tries to convert the argument into a bool. Returns false if any error
+// occurs.
 func Bool(value interface{}) bool {
 	b, _ := strconv.ParseBool(String(value))
 	return b
 }
 
-/*
-	Tries to convert the argument into a reflect.Kind element.
-*/
+// Convert tries to convert the argument into a reflect.Kind element.
 func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 
 	switch reflect.TypeOf(value).Kind() {
@@ -662,22 +585,20 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 		case reflect.String:
 			if reflect.TypeOf(value).Elem().Kind() == reflect.Uint8 {
 				return string(value.([]byte)), nil
-			} else {
-				return String(value), nil
 			}
+			return String(value), nil
 		case reflect.Slice:
 		default:
-			return nil, fmt.Errorf("Could not convert slice into non-slice.")
+			return nil, fmt.Errorf("could not convert slice into non-slice")
 		}
 	case reflect.String:
 		switch t {
 		case reflect.Slice:
-			return Bytes(value), nil
+			return []rune(value.(string)), nil
 		}
 	}
 
 	switch t {
-
 	case reflect.String:
 		return String(value), nil
 
@@ -723,13 +644,12 @@ func Convert(value interface{}, t reflect.Kind) (interface{}, error) {
 	case reflect.Interface:
 		return value, nil
 
-	case KindTime:
+	case kindTime:
 		return Time(value), nil
 
-	case KindDuration:
+	case kindDuration:
 		return Duration(value), nil
-
 	}
 
-	return nil, fmt.Errorf("Could not convert %s into %s.", reflect.TypeOf(value).Kind(), t)
+	return nil, fmt.Errorf("could not convert %s into %s", reflect.TypeOf(value).Kind(), t)
 }

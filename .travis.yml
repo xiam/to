@@ -1,14 +1,12 @@
 language: go
 
 go:
-  - 1.1
-  - 1.2
-  - tip
+  - 1.13
 
 env:
   - GOARCH=amd64
 
 script:
   - go version
-  - go get menteslibres.net/gosexy/to
-  - go test menteslibres.net/gosexy/to
+  - go test -v
+  - go test -bench=.
