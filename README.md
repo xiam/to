@@ -1,4 +1,4 @@
-# gosexy/to
+# to
 
 The `to` package provides quick-and-dirty conversions between built-in Go data
 types.  When any conversion is unreasonable a [zero value][3] is used as
@@ -9,12 +9,12 @@ not ignore any error in your program, you should better use the standard Go
 packages for conversion, such as [strconv][4], [fmt][5] or even [standard
 conversion][6] they may be better suited for the task.
 
-[![Build Status](https://travis-ci.org/gosexy/to.png)](https://travis-ci.org/gosexy/to)
+[![Build Status](https://travis-ci.org/xiam/to.svg?branch=master)](https://travis-ci.org/xiam/to)
 
 ## Installation
 
 ```sh
-go get -u github.com/gosexy/to
+go get -u github.com/xiam/to
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ go get -u github.com/gosexy/to
 Import the package
 
 ```go
-import "github.com/gosexy/to"
+import "github.com/xiam/to"
 ```
 
 Use the available `to` functions to convert a `float64` into a `string`:
@@ -83,7 +83,7 @@ go test -bench=.
 
 goos: linux
 goarch: amd64
-pkg: github.com/gosexy/to
+pkg: github.com/xiam/to
 BenchmarkFmtIntToString-4         	11385524	       105 ns/op
 BenchmarkFmtFloatToString-4       	 2266578	       531 ns/op
 BenchmarkStrconvIntToString-4     	202011031	         5.88 ns/op
@@ -97,7 +97,7 @@ BenchmarkIntToBool-4              	11871574	       106 ns/op
 BenchmarkStringToTime-4           	  211500	      4997 ns/op
 BenchmarkConvert-4                	13155015	        92.9 ns/op
 PASS
-ok  	github.com/gosexy/to	17.887s
+ok  	github.com/xiam/to	17.887s
 ```
 
 See the [docs][1] for a full reference of all the available `to` methods.
@@ -127,7 +127,7 @@ This is Open Source released under the terms of the MIT License:
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[1]: http://godoc.org/github.com/gosexy/to
+[1]: http://godoc.org/github.com/xiam/to
 [3]: http://golang.org/ref/spec#The_zero_value
 [4]: http://golang.org/pkg/strconv/
 [5]: http://golang.org/pkg/fmt/
