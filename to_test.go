@@ -74,6 +74,12 @@ func TestBoolean(t *testing.T) {
 func TestNil(t *testing.T) {
 	assert.Equal(t, "", String(""))
 	assert.Equal(t, "", String(nil))
+	assert.Equal(t, "0", String(Int(nil)))
+	assert.Equal(t, "0", String(Int64(nil)))
+	assert.Equal(t, "false", String(Bool(nil)))
+	assert.Equal(t, "0", String(Float64(nil)))
+	assert.Equal(t, "0", String(Uint64(nil)))
+	assert.Equal(t, "0s", String(Duration(nil)))
 }
 
 func TestBytes(t *testing.T) {

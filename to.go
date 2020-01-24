@@ -230,6 +230,11 @@ func complex128ToBytes(v complex128) []byte {
 // Time converts a date string into a time.Time value, several date formats are
 // tried.
 func Time(val interface{}) time.Time {
+
+	if val == nil {
+		return time.Time{}
+	}
+
 	switch t := val.(type) {
 	// We could use this later.
 	default:
@@ -247,6 +252,11 @@ func Time(val interface{}) time.Time {
 // Duration tries to convert the argument into a time.Duration value. Returns
 // time.Duration(0) if any error occurs.
 func Duration(val interface{}) time.Duration {
+
+	if val == nil {
+		return time.Duration(0)
+	}
+
 	switch t := val.(type) {
 	case int:
 		return time.Duration(int64(t))
@@ -403,6 +413,10 @@ func String(val interface{}) string {
 // error occurs.
 func Int64(val interface{}) int64 {
 
+	if val == nil {
+		return int64(0)
+	}
+
 	switch t := val.(type) {
 	case int:
 		return int64(t)
@@ -444,6 +458,10 @@ func Int64(val interface{}) int64 {
 // Int tries to convert the argument into an golang int. Returns int(0) if any
 // error occurs.
 func Int(val interface{}) int {
+
+	if val == nil {
+		return int(0)
+	}
 
 	switch t := val.(type) {
 	case int:
@@ -487,6 +505,10 @@ func Int(val interface{}) int {
 // any error occurs.
 func Uint64(val interface{}) uint64 {
 
+	if val == nil {
+		return uint64(0)
+	}
+
 	switch t := val.(type) {
 	case int:
 		return uint64(t)
@@ -528,6 +550,10 @@ func Uint64(val interface{}) uint64 {
 // Float64 tries to convert the argument into a float64. Returns float64(0.0)
 // if any error occurs.
 func Float64(val interface{}) float64 {
+
+	if val == nil {
+		return float64(0.0)
+	}
 
 	switch t := val.(type) {
 	case int:
@@ -572,6 +598,11 @@ func Float64(val interface{}) float64 {
 // Bool tries to convert the argument into a bool. Returns false if any error
 // occurs.
 func Bool(value interface{}) bool {
+
+	if value == nil {
+		return false
+	}
+
 	b, _ := strconv.ParseBool(String(value))
 	return b
 }
